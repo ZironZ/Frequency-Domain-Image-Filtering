@@ -1,0 +1,30 @@
+/* CSS Styles for the Image Frequency Filtering Tool */
+
+html,body{background-color: #eee;}
+h1{font-family:"Georgia", serif; margin:0px 0px 25px 0px; padding-left:20px; text-decoration:underline;}
+.AllWrapper{padding-left:10px;}
+
+#input{margin:0px 0px 10px 0px;}
+#HannWrapper{margin:0px 0px 25px 0px;}
+
+.imgWrapper{margin:0px 0px 25px 0px; text-decoration: underline;}
+.imgLabel{padding-left:10px; text-decoration: underline;}
+
+#FilterTypeWrapper{margin:0px 0px 15px 0px;}
+#FilterStyleHider{margin:0px 0px 15px 0px;}
+
+.slideLabelled{margin:20px 0px 20px 10px; width:600px;}
+#RadiusSlider{float:right; width:83%;}
+#BandSlider{float:right; width:80%;}
+#SharpSlider{float:right; width:76%;}
+#ButterSlider{float:right; width:77%;}
+#NotchSlider{float:right; width:85%;}
+
+#SpectrumWrapper{margin:15px 0px 25px 0px;}
+
+.buttonLabel{padding-left:10px; text-decoration: underline;}
+#WipeButton{margin:0px 0px 0px 0px;}
+#ZoomIn{margin:0px 0px 20px 0px;}
+#ZoomOut{margin:0px 0px 20px 0px;}
+#LockToImageRez{margin:0px 0px 20px 0px;}
+#ApplyFilter{margin:0px 0px 20px 0px;}
