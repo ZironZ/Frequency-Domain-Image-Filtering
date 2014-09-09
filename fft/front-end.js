@@ -319,7 +319,7 @@ $(function() {
 				$('#CommandsHider').show();
 				$('#Ideal').attr('checked', 'Ideal').button('refresh');
 				$('#Measure').attr('checked', 'Measure').button('refresh');
-				$('#Dampen').attr('checked', 'Dampen').button('refresh');
+				$('#Basic').attr('checked', 'Basic').button('refresh');
 				
 				//Clear the canvas objects
 				spectrum.fillStyle = '#000000';
