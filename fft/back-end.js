@@ -1,10 +1,7 @@
 /* This file is concerned with the back-end calculations that underpin 
- * the javascript application. It contains objects that carry out the 
- * FFT, filtering, and creation of the spectrums. It also has functions 
- * that help manage the complexity of dealing with all three rgb colour
- * channels.
- *
- * Nick: ZironZ
+ * the javascript application. 
+ * 
+ * It contains functions and objects that transform the input images.
  */
  
 /* This function creates an object that contains three real and three
@@ -38,6 +35,46 @@ function deepCopySingle(oldChan, newChan) {
 	for (var i = 0; i < oldChan.length; i++) {
 		newChan[i] = oldChan[i];
 	}
+}
+
+/* Converts a Monochrome2 DICOM image to RGBA and
+ * places it in the canvas for the original image.
+ */
+function convertMonochrome2Dicom(event) {
+	//https://gist.github.com/borismus/1032746
+	function convertDataURIToBinary(dataURI) {
+		var BASE64_MARKER = ';base64,';
+		var base64Index = dataURI.indexOf(BASE64_MARKER) + BASE64_MARKER.length;
+		var base64 = dataURI.substring(base64Index);
+		var raw = window.atob(base64);
+		var rawLength = raw.length;
+		var array = new Uint8Array(new ArrayBuffer(rawLength));
+
+		for(var i = 0; i < rawLength; i++) {
+			array[i] = raw.charCodeAt(i);
+		}
+		return array;
+	}
+
+	var dicomArray = new Uint8Array(convertDataURIToBinary(event.target.result));
+	var dataSet = dicomParser.parseDicom(dicomArray);
+	//get width, height, and largest pixel value of the Dicom image
+	var diwidth = dataSet.uint16('x00280011'), diHeight = dataSet.uint16('x00280010'), highval = dataSet.uint16('x00280107');
+	//Get the pixel data from the dicom file
+	var pixelDataElement = dataSet.elements.x7fe00010;
+	var pixelData = new Uint16Array(dataSet.byteArray.buffer, pixelDataElement.dataOffset, pixelDataElement.length / 2);
+	//Get the data for the canvas the image is being placed in
+	orig.canvas.width = diwidth;
+	orig.canvas.height = diHeight;
+	var imageData = orig.getImageData(0, 0, diwidth, diHeight);
+	var iData = imageData.data;
+	//Converting from 12-bit grayscale to 8-bit rgba
+	for (var i = 0, k = 0; i < iData.byteLength; i = i + 4, k = k + 1) {
+		var depthResult = (pixelData[k]/highval) * 256;
+		iData[i] = iData[i+1] = iData[i+2] = depthResult;
+		iData[i+3] = 255;
+	}
+	orig.putImageData(imageData, 0, 0);
 }
 
 /* This function abstracts away most of the calls made to the 
@@ -78,7 +115,7 @@ function operate(aFFT, operation, valueA, valueB, valueC, valueD) {
 
 /* This object's main purpose is to perform a 2D FFT on one colour channel of an image.
  * The layout of the object and most of the code are taken from: 
- * 		https://github.com/wellflat/javascriptlabs/blob/master/cv/fft/fft.js
+ * 		https://github.com/wellflat/imageprocessing-labs/blob/master/cv/fft/fft.js
  * There have been some small changes made to it in order for it to correctly utilize typed arrays.
  */
 (function() {

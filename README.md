@@ -2,11 +2,12 @@
 
 This is a small web application that can perform some basic frequency domain filtering on images. It interactively shows the results of the filtering on the frequency domain. The user is also able to apply the inverse transform and see a filtered version of their image.
 
-This was originally created as a final project for my computer graphics class, but I have added a few small features to it since finishing the project.
+This was originally created as a final project for my university computer graphics class, but I have added a few small features to it since finishing the project.
 
 You can test it out [here](http://semapho.re/fft/).
 
-###Overview of the Various Options
+###Overview of Features
+- Supports traditional web friendly image formats (BMP, JPEG, PNG) and Monochrome2 DICOM images.
 - Hanning Window: Adds a hanning window to the image which removes edge artifacts in the frequency domain. This is pointless when filtering images, but can be handy when attempting to measure their magnitude spectrums.
 - Filter Types
   - Measure: This lets the user draw a box on the spectrum to measure how large part of it is. It is useful when trying to tell if an image or video has been upscaled from a lower resolution.
@@ -32,6 +33,5 @@ You can test it out [here](http://semapho.re/fft/).
 
 ###TODO (Maybe)
 
-- Redo the fft algorithm and dampened spectrum display so that they are performed using WebGL instead of native javascript typed arrays.  
-- Remake the application using a proper framework like Angular designed for single page applications.
+- Redo the fft algorithm and dampened spectrum display so that they are performed using WebGL instead of native javascript typed arrays.
 - Redesign the filtering so that it is possible to stack filters. As it stands, each filter is applied separately and it is impossible to combine them.
