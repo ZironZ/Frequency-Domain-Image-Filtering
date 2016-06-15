@@ -1,161 +1,158 @@
-<!-- This file contains the html and custom styling for the application.
-	 
-	 Nick: ZironZ
--->
 <!DOCTYPE html>
 <html lang="en">
-	<head>
-		<meta charset="utf-8">
-		<meta http-equiv="content-type" content="text/html; charset=UTF-8">
-		<link rel="stylesheet" type="text/css" href="./fft/jquery-ui-1.9.2.custom.min.css">
-		<link rel="stylesheet" type="text/css" href="./fft/fft_filter.css">
-		<title>Image Frequency Filtering</title>
-	</head>
-	<body>
-		<article>
-			<header>
-				<h1>Image Frequency Filtering</h1>
-			</header>
-		  
-			<div class="AllWrapper">
-				<input type="file" id="input"/>
-				<div id="HannWrapper" class="buttonsLabelled">	
-					<label class="buttonLabel">Hanning Window</label>
-					<div id="Hann">
-						<input type="radio" id="HannOn" name="winhann" value="HannOn" />
-						<label for="HannOn">On</label>
-						<input type="radio" id="HannOff" name="winhann" value="HannOff" checked="checked"/>
-						<label for="HannOff">Off</label>
-					</div>
-				</div>
-			
-				<div id="ImageHider" class="hider">	
-					<div class="imgWrapper">
-						<label class="imgLabel">Original<br />
-							<canvas id="Original"></canvas>
-						</label>
-					</div>
-					<div class="imgWrapper">
-						<label class="imgLabel">Filtered Result<br />
-							<canvas id="Result"></canvas>
-						</label>
-					</div>
-					<div class="imgWrapper">
-						<label class="imgLabel">Spectrum</label>
-							<div id="NotchWrapper" style="position: relative">
-								<canvas id="Spectrum" style="position: absolute; left: 0; top: 0;"></canvas>
-								<canvas id="NotchSpec" style="position: absolute; left: 0; top: 0;"></canvas>
-							</div>
-					</div>
-				</div>
-			
-				<div id="CommandsHider" class="hider">	
-					<div id="FilterTypeWrapper" class="buttonsLabelled">	
-						<label class="buttonLabel">Filter Type</label>                  
-						<div id="FilterType">
-						  <input type="radio" id="Measure" name="ftype" value="Measure" checked="checked" />
-						  <label for="Measure">Measure</label>
-						  <input type="radio" id="HighPass" name="ftype" value="HighPass" />
-						  <label for="HighPass">High-Pass</label>
-						  <input type="radio" id="LowPass" name="ftype" value="LowPass" />
-						  <label for="LowPass">Low-Pass</label>
-						  <input type="radio" id="BandPass" name="ftype" value="BandPass" />
-						  <label for="BandPass">Band-Pass</label>
-						  <input type="radio" id="BandStop" name="ftype" value="BandStop" />
-						  <label for="BandStop">Band-Stop</label>
-						  <input type="radio" id="Sharpen" name="ftype" value="Sharpen" />
-						  <label for="Sharpen">Sharpen</label>
-						  <input type="radio" id="Notch" name="ftype" value="Notch" />
-						  <label for="Notch">Notch</label>
-						</div>
-					</div>
-				
-					<div id="FilterStyleHider" class="hider buttonsLabelled">	
-						<label class="buttonLabel">Filter Style</label>                  
-						<div id="FilterStyle">
-							<input type="radio" id="Ideal" name="fstyle" value="Ideal" checked="checked" />
-							<label for="Ideal">Ideal</label>
-							<input type="radio" id="Butter" name="fstyle" value="Butter" />
-							<label for="Butter">Butterworth</label>
-						</div>
-					</div>
-				
-					<div id="RadiusSliderHider" class="hider slideLabelled">	
-						<label>Filter Radius: </label>
-						<div id="RadiusSlider" class="Slider"></div>
-					</div>
-					
-					<div id="BandSliderHider" class="hider slideLabelled">	
-						<label>Bandwidth Size: </label>
-						<div id="BandSlider" class="Slider"></div>
-					</div>
-					
-					<div id="SharpSliderHider" class="hider slideLabelled">	
-						<label>Sharpness Strength: </label>
-						<div id="SharpSlider" class="Slider"></div>
-					</div>
-					
-					<div id="ButterSliderHider" class="hider slideLabelled">	
-						<label>Butterworth Order: </label>
-						<div id="ButterSlider" class="Slider"></div>
-					</div>
-					
-					<div id="NotchSliderHider" class="hider slideLabelled">	
-						<label>Brush Size: </label>
-						<div id="NotchSlider" class="Slider"></div>
-					</div>
-				
-					<div id="MeasInfoHider" class="hider slideLabelled">	
-						<div id="MeasInfo"><span></span></div>
-					</div>
-				
-					<div id="WipeButtonHider" class="hider slideLabelled">	
-						<button id="WipeButton">Clear Measurement</button>
-					</div>
-				
-					<div id="SpectrumWrapper" class="buttonsLabelled">
-						<label class="buttonLabel">Spectrum Display</label>
-						<div id="ViewType">
-							<input type="radio" id="Basic" name="view" value="Basic" checked="checked" />
-							<label for="Basic">Basic Log</label>
-							<input type="radio" id="Dampen" name="view" value="Dampen" />
-							<label for="Dampen">Dampened</label>
-							<input type="radio" id="None" name="view" value="None" />
-							<label for="None">No Scaling</label>
-							<input type="radio" id="Phase" name="view" value="Phase" />
-							<label for="Phase">Phase</label>
-						</div>
-					</div>
-					
-					<button id="ZoomIn">Zoom In</button>
-					<button id="ZoomOut">Zoom Out</button>
-					<button id="LockToImageRez">Lock to Image Resolution</button>
-					
-					<div>
-						<button id="ApplyFilter">Apply Filtering</button>
-					</div>
-					
-					<div id="SaveSpecHider" class="hider">
-						<button id="SaveSpec">Save Spectrum</button>
-					</div>
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+    <link rel="stylesheet" type="text/css" href="./css/jquery-ui-1.9.2.custom.min.css">
+    <link rel="stylesheet" type="text/css" href="./css/fft_filter.css">
+    <title>Image Frequency Filtering</title>
+</head>
+<body>
+<article>
+    <header>
+        <h1>Image Frequency Filtering</h1>
+    </header>
 
-					<div id="SaveResultHider" class="hider">
-						<button id="SaveResult">Save Result</button>
-					</div>
-				</div>
-				
-				<div id="ArrayOfValues"></div>
-				
-				<div id="Etcetera">	
-					<p>
-						This site will not work in any version of IE below IE10.</p>
-				</div>
-			</div>
-		</article>
-		<script src="./fft/jquery.min.js"></script>
-		<script src="./fft/jquery-ui-1.9.2.custom.min.js"></script>
-		<script src="./fft/dicomParser.min.js"></script>
-		<script src="./fft/front-end.js"></script>
-		<script src="./fft/back-end.js"></script>
-	</body>
+    <div class="AllWrapper">
+        <input type="file" id="input"/>
+        <div id="HannWrapper" class="buttonsLabelled">
+            <label class="buttonLabel">Hanning Window</label>
+            <div id="Hann">
+                <input type="radio" id="HannOn" name="winhann" value="HannOn"/>
+                <label for="HannOn">On</label>
+                <input type="radio" id="HannOff" name="winhann" value="HannOff" checked="checked"/>
+                <label for="HannOff">Off</label>
+            </div>
+        </div>
+        <div id="OrigLabel" class="imgLabel hider">Original<br/>
+        </div>
+        <div id="OrigWrapper" class="imgWrapper" style="width:1px; height:1px">
+        </div>
+
+        <div id="ImageHider" class="hider">
+            <div class="imgLabel">Filtered Result<br/></div>
+            <div id="ResultWrapper" class="imgWrapper">
+                <canvas id="Result"></canvas>
+            </div>
+
+            <div class="imgLabel">Spectrum</div>
+            <div id="NotchWrapper" class="imgWrapper">
+                <div style="position: relative">
+                    <canvas id="Spectrum" style="position: absolute; left: 0; top: 0;"></canvas>
+                    <canvas id="NotchSpec" style="position: absolute; left: 0; top: 0;"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <div id="CommandsHider" class="hider">
+            <div id="FilterTypeWrapper" class="buttonsLabelled">
+                <label class="buttonLabel">Filter Type</label>
+                <div id="FilterType">
+                    <input type="radio" id="Measure" name="ftype" value="Measure" checked="checked"/>
+                    <label for="Measure">Measure</label>
+                    <input type="radio" id="HighPass" name="ftype" value="HighPass"/>
+                    <label for="HighPass">High-Pass</label>
+                    <input type="radio" id="LowPass" name="ftype" value="LowPass"/>
+                    <label for="LowPass">Low-Pass</label>
+                    <input type="radio" id="BandPass" name="ftype" value="BandPass"/>
+                    <label for="BandPass">Band-Pass</label>
+                    <input type="radio" id="BandStop" name="ftype" value="BandStop"/>
+                    <label for="BandStop">Band-Stop</label>
+                    <input type="radio" id="Sharpen" name="ftype" value="Sharpen"/>
+                    <label for="Sharpen">Sharpen</label>
+                    <input type="radio" id="Notch" name="ftype" value="Notch"/>
+                    <label for="Notch">Notch</label>
+                </div>
+            </div>
+
+            <div id="FilterStyleHider" class="hider buttonsLabelled">
+                <label class="buttonLabel">Filter Style</label>
+                <div id="FilterStyle">
+                    <input type="radio" id="Ideal" name="fstyle" value="Ideal" checked="checked"/>
+                    <label for="Ideal">Ideal</label>
+                    <input type="radio" id="Butter" name="fstyle" value="Butter"/>
+                    <label for="Butter">Butterworth</label>
+                </div>
+            </div>
+
+            <div id="RadiusSliderHider" class="hider slideLabelled">
+                <label>Filter Radius: </label>
+                <div id="RadiusSlider" class="Slider"></div>
+            </div>
+
+            <div id="BandSliderHider" class="hider slideLabelled">
+                <label>Bandwidth Size: </label>
+                <div id="BandSlider" class="Slider"></div>
+            </div>
+
+            <div id="SharpSliderHider" class="hider slideLabelled">
+                <label>Sharpness Strength: </label>
+                <div id="SharpSlider" class="Slider"></div>
+            </div>
+
+            <div id="ButterSliderHider" class="hider slideLabelled">
+                <label>Butterworth Order: </label>
+                <div id="ButterSlider" class="Slider"></div>
+            </div>
+
+            <div id="NotchSliderHider" class="hider slideLabelled">
+                <label>Brush Size: </label>
+                <div id="NotchSlider" class="Slider"></div>
+            </div>
+
+            <div id="MeasInfoHider" class="hider slideLabelled">
+                <div id="MeasInfo"><span></span></div>
+            </div>
+
+            <div id="WipeButtonHider" class="hider slideLabelled">
+                <button id="WipeButton">Clear Measurement</button>
+            </div>
+
+            <div id="SpectrumWrapper" class="buttonsLabelled">
+                <label class="buttonLabel">Spectrum Display</label>
+                <div id="ViewType">
+                    <input type="radio" id="Basic" name="view" value="Basic" checked="checked"/>
+                    <label for="Basic">Basic Log</label>
+                    <input type="radio" id="Dampen" name="view" value="Dampen"/>
+                    <label for="Dampen">Dampened</label>
+                    <input type="radio" id="None" name="view" value="None"/>
+                    <label for="None">No Scaling</label>
+                    <input type="radio" id="Phase" name="view" value="Phase"/>
+                    <label for="Phase">Phase</label>
+                </div>
+            </div>
+
+            <button id="ZoomIn">Zoom In</button>
+            <button id="ZoomOut">Zoom Out</button>
+            <button id="LockToImageRez">Lock to Image Resolution</button>
+
+            <div>
+                <button id="ApplyFilter">Apply Filtering</button>
+            </div>
+
+            <div id="SaveSpecHider" class="hider">
+                <button id="SaveSpec">Save Spectrum</button>
+            </div>
+
+            <div id="SaveResultHider" class="hider">
+                <button id="SaveResult">Save Result</button>
+            </div>
+        </div>
+
+        <div id="ArrayOfValues"></div>
+
+        <div id="Etcetera">
+            <p>
+                This site will not work in any version of IE below IE10.</p>
+        </div>
+    </div>
+</article>
+<script src="./scripts/jquery.min.js"></script>
+<script src="./scripts/jquery-ui-1.9.2.custom.min.js"></script>
+<script src="./scripts/dicomParser.min.js"></script>
+<script src="./scripts/cornerstone.min.js"></script>
+<script src="./scripts/cornerstoneWADOImageLoader.min.js"></script>
+<script src="./scripts/front-end.js"></script>
+<script src="./scripts/back-end.js"></script>
+</body>
 </html>

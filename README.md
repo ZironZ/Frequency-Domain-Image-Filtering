@@ -7,7 +7,7 @@ This was originally created as a final project for my university computer graphi
 You can test it out [here](http://semapho.re/fft/).
 
 ###Overview of Features
-- Supports traditional web friendly image formats (BMP, JPEG, PNG) and Monochrome2 DICOM images.
+- Supports traditional web friendly image formats (BMP, JPEG, PNG) and simple DICOM images.
 - Hanning Window: Adds a hanning window to the image which removes edge artifacts in the frequency domain. This is pointless when filtering images, but can be handy when attempting to measure their magnitude spectrums.
 - Filter Types
   - Measure: This lets the user draw a box on the spectrum to measure how large part of it is. It is useful when trying to tell if an image or video has been upscaled from a lower resolution.
@@ -32,6 +32,5 @@ You can test it out [here](http://semapho.re/fft/).
 - Apply Filtering: Displays a filtered image based on whatever filter options are currently set.
 
 ###TODO (Maybe)
-
 - Redo the fft algorithm and dampened spectrum display so that they are performed using WebGL instead of native javascript typed arrays.
 - Redesign the filtering so that it is possible to stack filters. As it stands, each filter is applied separately and it is impossible to combine them.

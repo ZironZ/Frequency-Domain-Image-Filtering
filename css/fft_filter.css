@@ -1,8 +1,7 @@
-/* CSS Styles for the Image Frequency Filtering Tool */
-
 html,body{background-color: #eee;}
 h1{font-family:"Georgia", serif; margin:0px 0px 25px 0px; padding-left:20px; text-decoration:underline;}
 .AllWrapper{padding-left:10px;}
+.hider{display: none;}
 
 #input{margin:0px 0px 10px 0px;}
 #HannWrapper{margin:0px 0px 25px 0px;}
