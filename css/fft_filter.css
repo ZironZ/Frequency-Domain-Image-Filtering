@@ -4,7 +4,8 @@ h1{font-family:"Georgia", serif; margin:0px 0px 25px 0px; padding-left:20px; tex
 .hider{display: none;}
 
 #input{margin:0px 0px 10px 0px;}
-#HannWrapper{margin:0px 0px 25px 0px;}
+#HannWrapper{margin:0px 0px 10px 0px;}
+#BlueWrapper{margin:0px 0px 25px 0px;}
 
 .imgWrapper{margin:0px 0px 25px 0px; text-decoration: underline;}
 .imgLabel{padding-left:10px; text-decoration: underline;}

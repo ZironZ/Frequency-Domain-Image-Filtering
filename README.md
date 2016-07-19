@@ -2,13 +2,14 @@
 
 This is a small web application that can perform some basic frequency domain filtering on images. It interactively shows the results of the filtering on the frequency domain. The user is also able to apply the inverse transform and see a filtered version of their image.
 
-This was originally created as a final project for my university computer graphics class, but I have added a few small features to it since finishing the project.
+This was originally created as a final project for my university computer graphics class, but I have added a few features to it since finishing the project.
 
 You can test it out [here](http://semapho.re/fft/).
 
 ###Overview of Features
 - Supports traditional web friendly image formats (BMP, JPEG, PNG) and simple DICOM images.
 - Hanning Window: Adds a hanning window to the image which removes edge artifacts in the frequency domain. This is pointless when filtering images, but can be handy when attempting to measure their magnitude spectrums.
+- Bluestein's Algorithm: Uses Bluestein's algorithm when selected. This creates a spectrum with a size divisible by 2. When it is not selected radix-2 is used and the spectrum is 2^n in size. Bluestein is slower when performing forward and inverse transforms. However, it is faster when showing the results of filtering on the frequency domain.
 - Filter Types
   - Measure: This lets the user draw a box on the spectrum to measure how large part of it is. It is useful when trying to tell if an image or video has been upscaled from a lower resolution.
   - High-Pass: Zeros out frequencies below a certain radius.
@@ -28,9 +29,9 @@ You can test it out [here](http://semapho.re/fft/).
   - Phase: This shows the phase of the image. Note that any filtering that is done when this is pressed still affects the magnitude spectrum of the image and not the phase.
 - Zoom In: Zooms in the image by 50% each time it is pressed.
 - Zoom Out: Zooms out the image by 50% each time it is pressed.
-- Lock/Unlock from Image Resolution: The spectrum is internally a power-of-two. This button changes between displaying the power-of-two representation and a resized version that is the same resolution as the source image.
+- Lock/Unlock from Image Resolution: This button changes between displaying the actual size of the spectrum and a resized version that is the same resolution as the source image.
 - Apply Filtering: Displays a filtered image based on whatever filter options are currently set.
 
 ###TODO (Maybe)
-- Redo the fft algorithm and dampened spectrum display so that they are performed using WebGL instead of native javascript typed arrays.
+- Redo the fft algorithms and filtering so that they are performed using WebGL instead of native javascript typed arrays.
 - Redesign the filtering so that it is possible to stack filters. As it stands, each filter is applied separately and it is impossible to combine them.

@@ -17,11 +17,20 @@
         <input type="file" id="input"/>
         <div id="HannWrapper" class="buttonsLabelled">
             <label class="buttonLabel">Hanning Window</label>
-            <div id="Hann">
+                <div id="Hann">
                 <input type="radio" id="HannOn" name="winhann" value="HannOn"/>
                 <label for="HannOn">On</label>
                 <input type="radio" id="HannOff" name="winhann" value="HannOff" checked="checked"/>
                 <label for="HannOff">Off</label>
+            </div>
+        </div>
+        <div id="BlueWrapper" class="buttonsLabelled">
+            <label class="buttonLabel">Bluestein's Algorithm</label>
+            <div id="Blue">
+                <input type="radio" id="BlueOn" name="bluestein" value="BlueOn"/>
+                <label for="BlueOn">On</label>
+                <input type="radio" id="BlueOff" name="bluestein" value="BlueOff" checked="checked"/>
+                <label for="BlueOff">Off</label>
             </div>
         </div>
         <div id="OrigLabel" class="imgLabel hider">Original<br/>
@@ -153,6 +162,7 @@
 <script src="./scripts/cornerstone.min.js"></script>
 <script src="./scripts/cornerstoneWADOImageLoader.min.js"></script>
 <script src="./scripts/front-end.js"></script>
+<script src="./scripts/fft.js"></script>
 <script src="./scripts/back-end.js"></script>
 </body>
 </html>

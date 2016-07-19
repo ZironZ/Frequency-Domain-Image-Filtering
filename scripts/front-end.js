@@ -167,6 +167,7 @@ $(function () {
 
     //Enable all the jQuery UI buttons
     $('#Hann').buttonset();
+    $('#Blue').buttonset();
     $('#FilterType').buttonset();
     $('#FilterStyle').buttonset();
     $('#WipeButton').button();
@@ -229,6 +230,15 @@ $(function () {
                 aFFT = null,
                 savedFFT = null;
 
+            if ($('input[name=bluestein]:checked').val() === 'BlueOn') {
+                //Although the bluestein algorithm can handle arbitrary sizes,
+                //it simplifies things if we limit it to be divisible by 2
+                specWidth = Math.ceil(anImage.width/2)*2;
+                specHeight = Math.ceil(anImage.height/2)*2;
+                zoomSpecWidth = specWidth;
+                zoomSpecHeight = specHeight;
+            }
+
             //Set every canvas to the correct size
             spectrum.canvas.width = notchSpec.canvas.width = specWidth;
             spectrum.canvas.height = notchSpec.canvas.height = specHeight;
@@ -271,8 +281,8 @@ $(function () {
             //Initalize the backend objects
             aFFT = new Transform(specWidth * specHeight);
             savedFFT = new Transform(specWidth * specHeight);
-            FFT.init(specWidth);
-            Filtering.init(specWidth, imgWidth, imgHeight);
+            FFT.init(specWidth, specHeight);
+            Filtering.init(specWidth, specHeight, imgWidth, imgHeight);
             SpecMaker.init(spectrum);
 
             //Window the input if the user requested it
@@ -286,9 +296,9 @@ $(function () {
                     hannData = hannSrc.data;
 
                 Filtering.hannWindow(hannData);
-                spectrum.putImageData(hannSrc, (specWidth - imgWidth) / 2, (specHeight - imgHeight) / 2, 0, 0, imgWidth, imgHeight);
+                spectrum.putImageData(hannSrc, 0, 0, 0, 0, imgWidth, imgHeight);
             } else {
-                spectrum.drawImage(anImage, (specWidth - imgWidth) / 2, (specHeight - imgHeight) / 2, imgWidth, imgHeight);
+                spectrum.drawImage(anImage, 0, 0, imgWidth, imgHeight);
             }
 
             //Retrieve the zero padded data
@@ -468,12 +478,6 @@ $(function () {
                     zoomSpecHeight = zoomSpecHeight << 1;
                     zoomLevel = zoomLevel / 2;
 
-                    /*
-                     if (zoomLevel > 1) {
-                     zoomLevel = zoomLevel >> 1;
-                     }
-                     */
-
                     $("#Original").css({'width': zoomImgWidth, 'height': zoomImgHeight});
                     $("#Result").css({'width': zoomImgWidth, 'height': zoomImgHeight});
                     $("#OrigWrapper").css({'width': zoomImgWidth, 'height': zoomImgHeight});
@@ -505,7 +509,6 @@ $(function () {
                         zoomSpecWidth = zoomSpecWidth >> 1;
                         zoomSpecHeight = zoomSpecHeight >> 1;
                         zoomLevel = zoomLevel * 2;
-                        //zoomLevel = zoomLevel << 1;
                     }
 
                     $("#Original").css({'width': zoomImgWidth, 'height': zoomImgHeight});
@@ -564,7 +567,7 @@ $(function () {
                  */
                 $('#SaveSpec').click(function () {
                     var win = window.open();
-                    win.document.write('<img src="' + $("#Spectrum").toDataURL() + '"/>');
+                    win.document.write('<img src="' + document.querySelector('#Spectrum').toDataURL() + '"/>');
                     win.document.close();
                 });
 
@@ -573,7 +576,7 @@ $(function () {
                  */
                 $('#SaveResult').click(function () {
                     var win = window.open();
-                    win.document.write('<img src="' + $("#Result").toDataURL() + '"/>');
+                    win.document.write('<img src="' + document.querySelector('#Result').toDataURL() + '"/>');
                     win.document.close();
                 });
             }
@@ -586,8 +589,7 @@ $(function () {
                     bandwidth = $('#BandSlider').slider('option', 'value'),
                     sharpness = $('#SharpSlider').slider('option', 'value'),
                     butterOrder = $('#ButterSlider').slider('option', 'value'),
-                    filterStyle = $('input[name=fstyle]:checked').val(),
-                    viewType = $('input[name=view]:checked').val();
+                    filterStyle = $('input[name=fstyle]:checked').val();
 
                 operate(aFFT, Filtering.shiftQuads);
 
@@ -642,13 +644,7 @@ $(function () {
                     }
                 }
 
-                //This is used to get around the inability to crop with putImageData()
-                var tempCanvas = document.createElement('canvas');
-                tempCanvas.height = src.width;
-                tempCanvas.width = src.height;
-                tempCanvas.getContext('2d').putImageData(src, 0, 0);
-
-                result.drawImage(tempCanvas, (specWidth - imgWidth) / 2, (specHeight - imgHeight) / 2, imgWidth, imgHeight, 0, 0, imgWidth, imgHeight);
+                result.putImageData(src, 0, 0);
                 deepCopy(savedFFT, aFFT);
                 $('#SaveResultHider').show();
             }

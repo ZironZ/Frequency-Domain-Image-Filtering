@@ -74,9 +74,6 @@ function operate(aFFT, operation, valueA, valueB, valueC, valueD) {
 }
 
 /* This object's main purpose is to perform a 2D FFT on one colour channel of an image.
- * The layout of the object and most of the code are taken from: 
- * 		https://github.com/wellflat/imageprocessing-labs/blob/master/cv/fft/fft.js
- * There have been some small changes made to it in order for it to correctly utilize typed arrays.
  */
 (function () {
     var FFT;           //Top-level namespace
@@ -85,218 +82,110 @@ function operate(aFFT, operation, valueA, valueB, valueC, valueD) {
     FFT = _root.FFT = {};
 
     var version = {
-        release: '0.2.1',
-        date: '01/14/2013'
+        release: '0.2.2',
+        date: '07/17/2016'
     };
     FFT.toString = function () {
         return "version " + version.release + ", released " + version.date;
     };
 
     //Core operations
-    var _n = 0,          //FFT size
-        _bitrev = null,  //Bit reversal table
-        _cstb = null;    //Sin/cos table
+    var _x = 0, //FFT size
+        _y = 0;
     var core = {
-        init: function (n) {
-            if (n !== 0 && (n & (n - 1)) === 0) {
-                _n = n;
-                core._setVariables();
-                core._makeBitReversal();
-                core._makeCosSinTable();
+        init: function (width, height) {
+            if (width !== 0 || height !== 0) {
+                _x = width;
+                _y = height;
             } else {
-                //throw new Error("init: radix-2 required");
-            }
-        },
-
-        //1D-FFT
-        fft1d: function (re, im) {
-            core.fft(re, im, 1);
-        },
-
-        //1D-IFFT
-        ifft1d: function (re, im) {
-            var n = 1 / _n;
-            core.fft(re, im, -1);
-            for (var i = 0; i < _n; i++) {
-                re[i] *= n;
-                im[i] *= n;
+                //throw new Error("init: invalid size");
             }
         },
 
         //2D-FFT
         fft2d: function (re, im) {
-            var tre = new Float64Array(_n),
-                tim = new Float64Array(_n),
+            var x_tre = new Float64Array(_x),
+                x_tim = new Float64Array(_x),
                 i = 0;
 
             //X-axis
-            for (var y = 0; y < _n; y++) {
-                i = y * _n;
-                for (var x1 = 0; x1 < _n; x1++) {
-                    tre[x1] = re[x1 + i];
-                    tim[x1] = im[x1 + i];
+            for (var y = 0; y < _y; y++) {
+                i = y * _x;
+                for (var x1 = 0; x1 < _x; x1++) {
+                    x_tre[x1] = re[x1 + i];
+                    x_tim[x1] = im[x1 + i];
                 }
-                core.fft1d(tre, tim);
-                for (var x2 = 0; x2 < _n; x2++) {
-                    re[x2 + i] = tre[x2];
-                    im[x2 + i] = tim[x2];
+                transform(x_tre, x_tim);
+                for (var x2 = 0; x2 < _x; x2++) {
+                    re[x2 + i] = x_tre[x2];
+                    im[x2 + i] = x_tim[x2];
                 }
             }
             //Y-axis
-            for (var x = 0; x < _n; x++) {
-                for (var y1 = 0; y1 < _n; y1++) {
-                    i = x + y1 * _n;
-                    tre[y1] = re[i];
-                    tim[y1] = im[i];
+            var y_tre = new Float64Array(_y),
+                y_tim = new Float64Array(_y);
+            for (var x = 0; x < _x; x++) {
+                for (var y1 = 0; y1 < _y; y1++) {
+                    i = x + y1 * _x;
+                    y_tre[y1] = re[i];
+                    y_tim[y1] = im[i];
                 }
-                core.fft1d(tre, tim);
-                for (var y2 = 0; y2 < _n; y2++) {
-                    i = x + y2 * _n;
-                    re[i] = tre[y2];
-                    im[i] = tim[y2];
+                transform(y_tre, y_tim);
+                for (var y2 = 0; y2 < _y; y2++) {
+                    i = x + y2 * _x;
+                    re[i] = y_tre[y2];
+                    im[i] = y_tim[y2];
                 }
             }
         },
 
         //2D-IFFT
         ifft2d: function (re, im) {
-            var tre = new Float64Array(_n),
-                tim = new Float64Array(_n),
+            var x_tre = new Float64Array(_x),
+                x_tim = new Float64Array(_x),
                 i = 0;
             //X-axis
-            for (var y = 0; y < _n; y++) {
-                i = y * _n;
-                for (var x1 = 0; x1 < _n; x1++) {
-                    tre[x1] = re[x1 + i];
-                    tim[x1] = im[x1 + i];
+            for (var y = 0; y < _y; y++) {
+                i = y * _x;
+                for (var x1 = 0; x1 < _x; x1++) {
+                    x_tre[x1] = re[x1 + i];
+                    x_tim[x1] = im[x1 + i];
                 }
-                core.ifft1d(tre, tim);
-                for (var x2 = 0; x2 < _n; x2++) {
-                    re[x2 + i] = tre[x2];
-                    im[x2 + i] = tim[x2];
+                inverseTransformScaled(x_tre, x_tim);
+                for (var x2 = 0; x2 < _x; x2++) {
+                    re[x2 + i] = x_tre[x2];
+                    im[x2 + i] = x_tim[x2];
                 }
             }
             //Y-axis
-            for (var x = 0; x < _n; x++) {
-                for (var y1 = 0; y1 < _n; y1++) {
-                    i = x + y1 * _n;
-                    tre[y1] = re[i];
-                    tim[y1] = im[i];
+            var y_tre = new Float64Array(_y),
+                y_tim = new Float64Array(_y);
+            for (var x = 0; x < _x; x++) {
+                for (var y1 = 0; y1 < _y; y1++) {
+                    i = x + y1 * _x;
+                    y_tre[y1] = re[i];
+                    y_tim[y1] = im[i];
                 }
-                core.ifft1d(tre, tim);
-                for (var y2 = 0; y2 < _n; y2++) {
-                    i = x + y2 * _n;
-                    re[i] = tre[y2];
-                    im[i] = tim[y2];
+                inverseTransformScaled(y_tre, y_tim);
+                for (var y2 = 0; y2 < _y; y2++) {
+                    i = x + y2 * _x;
+                    re[i] = y_tre[y2];
+                    im[i] = y_tim[y2];
                 }
-            }
-        },
-
-        //Core operation of FFT
-        fft: function (re, im, inv) {
-            var d, h, ik, m, tmp, wr, wi, xr, xi,
-                n4 = _n >> 2;
-            //Bit reversal
-            for (var l = 0; l < _n; l++) {
-                m = _bitrev[l];
-                if (l < m) {
-                    tmp = re[l];
-                    re[l] = re[m];
-                    re[m] = tmp;
-                    tmp = im[l];
-                    im[l] = im[m];
-                    im[m] = tmp;
-                }
-            }
-
-            //Butterfly operation
-            for (var k = 1; k < _n; k <<= 1) {
-                h = 0;
-                d = _n / (k << 1);
-                for (var j = 0; j < k; j++) {
-                    wr = _cstb[h + n4];
-                    wi = inv * _cstb[h];
-                    for (var i = j; i < _n; i += (k << 1)) {
-                        ik = i + k;
-                        xr = wr * re[ik] + wi * im[ik];
-                        xi = wr * im[ik] - wi * re[ik];
-                        re[ik] = re[i] - xr;
-                        re[i] += xr;
-                        im[ik] = im[i] - xi;
-                        im[i] += xi;
-                    }
-                    h += d;
-                }
-            }
-        },
-
-        //Set variables
-        _setVariables: function () {
-            _bitrev = new Uint32Array(_n);
-            _cstb = new Float64Array(_n * 1.25);
-        },
-
-        //Make bit reversal table
-        _makeBitReversal: function () {
-            var i = 0,
-                j = 0,
-                k = 0;
-            _bitrev[0] = 0;
-            while (++i < _n) {
-                k = _n >> 1;
-                while (k <= j) {
-                    j -= k;
-                    k >>= 1;
-                }
-                j += k;
-                _bitrev[i] = j;
-            }
-        },
-
-        //Make trigonometiric function table
-        _makeCosSinTable: function () {
-            var n2 = _n >> 1,
-                n4 = _n >> 2,
-                n8 = _n >> 3,
-                n2p4 = n2 + n4,
-                t = Math.sin(Math.PI / _n),
-                dc = 2 * t * t,
-                ds = Math.sqrt(dc * (2 - dc)),
-                c = _cstb[n4] = 1,
-                s = _cstb[0] = 0;
-            t = 2 * dc;
-            for (var i = 1; i < n8; i++) {
-                c -= dc;
-                dc += t * c;
-                s += ds;
-                ds -= t * s;
-                _cstb[i] = s;
-                _cstb[n4 - i] = c;
-            }
-            if (n8 !== 0) {
-                _cstb[n8] = Math.sqrt(0.5);
-            }
-            for (var j = 0; j < n4; j++) {
-                _cstb[n2 - j] = _cstb[j];
-            }
-            for (var k = 0; k < n2p4; k++) {
-                _cstb[k + n2] = -_cstb[k];
             }
         }
     };
 
     //These are the public function names
-    var apis = ['init', 'fft1d', 'ifft1d', 'fft2d', 'ifft2d'];
+    var apis = ['init', 'fft2d', 'ifft2d'];
     for (var i = 0; i < apis.length; i++) {
         FFT[apis[i]] = core[apis[i]];
     }
-    FFT.fft = core.fft1d;
-    FFT.ifft = core.ifft1d;
 }).call(this);
 
 /* This object performs frequency domain filtering on a single color
  * channel of a 2D FFT. Most of the filters will be called three 
- * times, once for each colour channel, with the exptions being the 
+ * times, once for each colour channel, with the exceptions being the 
  * swapQuads and window functions. The layout of this object copies 
  * from the way the FFT object is laid out.
  */
@@ -306,19 +195,23 @@ function operate(aFFT, operation, valueA, valueB, valueC, valueD) {
 
     Filtering = _root.Filtering = {};
 
-    var _size = 0		//The spectrum's size
-    _sizeHalf = 0,	//The spectrum's size halved
-        _sizeSq = 0,	//The spectrum's size squared
-        _width = 0,		//The image's width
-        _height = 0;	//The image's height
+    var _specWidth = 0,         //Spectrum width
+        _specHeight = 0,        //Spectrum height
+        _specWidthHalf = 0,     //Half the spectrum's width
+        _specHeightHalf = 0,    //Half the spectrum's height
+        _specSizeSq = 0,        //The spectrum's size squared
+        _imgWidth = 0,          //The image's width
+        _imgHeight = 0;         //The image's height
 
     var core = {
-        init: function (size, width, height) {
-            _size = size;
-            _sizeHalf = _size / 2;
-            _sizeSq = _size * _size;
-            _width = width;
-            _height = height;
+        init: function (specWidth, specHeight,  imgWidth, imgHeight) {
+            _specWidth = specWidth;
+            _specHeight = specHeight;
+            _specWidthHalf = Math.floor(specWidth / 2);
+            _specHeightHalf = Math.floor(specHeight / 2);
+            _specSizeSq = specWidth * specHeight;
+            _imgWidth = imgWidth;
+            _imgHeight = imgHeight;
         },
 
         /* This function shifts around the quadrants of the FFT.
@@ -326,14 +219,14 @@ function operate(aFFT, operation, valueA, valueB, valueC, valueD) {
          */
         shiftQuads: function (real, imag) {
             var xNum, yNum, i, j, k, l, temp;
-            for (var y = 0; y < _sizeHalf; y++) {
-                yNum = y + _sizeHalf;
-                for (var x = 0; x < _sizeHalf; x++) {
-                    xNum = x + _sizeHalf;
-                    i = x + y * _size;
-                    j = xNum + yNum * _size;
-                    k = x + yNum * _size;
-                    l = xNum + y * _size;
+            for (var y = 0; y < _specHeightHalf; y++) {
+                yNum = y + _specHeightHalf;
+                for (var x = 0; x < _specWidthHalf; x++) {
+                    xNum = x + _specWidthHalf;
+                    i = x + y * _specWidth;
+                    j = xNum + yNum * _specWidth;
+                    k = x + yNum * _specWidth;
+                    l = xNum + y * _specWidth;
                     temp = real[i];
                     real[i] = real[j];
                     real[j] = temp;
@@ -357,9 +250,9 @@ function operate(aFFT, operation, valueA, valueB, valueC, valueD) {
                 point = 0,
                 radiusXY = 0.0;
 
-            for (var y = -_sizeHalf; y < _sizeHalf; y++) {
-                i = _sizeHalf + (y + _sizeHalf) * _size;
-                for (var x = -_sizeHalf; x < _sizeHalf; x++) {
+            for (var y = -_specHeightHalf; y < _specHeightHalf + 1; y++) {
+                i = _specWidthHalf + (y + _specHeightHalf) * _specWidth;
+                for (var x = -_specWidthHalf; x < _specWidthHalf; x++) {
                     radiusXY = Math.sqrt(x * x + y * y);
                     point = x + i;
                     if (style === 'Ideal') {
@@ -381,9 +274,9 @@ function operate(aFFT, operation, valueA, valueB, valueC, valueD) {
                 point = 0,
                 radiusXY = 0.0;
 
-            for (var y = -_sizeHalf; y < _sizeHalf; y++) {
-                i = _sizeHalf + (y + _sizeHalf) * _size;
-                for (var x = -_sizeHalf; x < _sizeHalf; x++) {
+            for (var y = -_specHeightHalf; y < _specHeightHalf + 1; y++) {
+                i = _specWidthHalf + (y + _specHeightHalf) * _specWidth;
+                for (var x = -_specWidthHalf; x < _specWidthHalf; x++) {
                     radiusXY = Math.sqrt(x * x + y * y);
                     point = x + i;
                     if (style === 'Ideal') {
@@ -405,9 +298,9 @@ function operate(aFFT, operation, valueA, valueB, valueC, valueD) {
                 point = 0,
                 radiusXY = 0.0;
 
-            for (var y = -_sizeHalf; y < _sizeHalf; y++) {
-                i = _sizeHalf + (y + _sizeHalf) * _size;
-                for (var x = -_sizeHalf; x < _sizeHalf; x++) {
+            for (var y = -_specHeightHalf; y < _specHeightHalf + 1; y++) {
+                i = _specWidthHalf + (y + _specHeightHalf) * _specWidth;
+                for (var x = -_specWidthHalf; x < _specWidthHalf; x++) {
                     radiusXY = Math.sqrt(x * x + y * y);
                     point = x + i;
                     if (style === 'Ideal') {
@@ -429,9 +322,9 @@ function operate(aFFT, operation, valueA, valueB, valueC, valueD) {
                 point = 0,
                 radiusXY = 0.0;
 
-            for (var y = -_sizeHalf; y < _sizeHalf; y++) {
-                i = _sizeHalf + (y + _sizeHalf) * _size;
-                for (var x = -_sizeHalf; x < _sizeHalf; x++) {
+            for (var y = -_specHeightHalf; y < _specHeightHalf + 1; y++) {
+                i = _specWidthHalf + (y + _specHeightHalf) * _specWidth;
+                for (var x = -_specWidthHalf; x < _specWidthHalf; x++) {
                     radiusXY = Math.sqrt(x * x + y * y);
                     point = x + i;
                     if (style === 'Ideal') {
@@ -449,14 +342,14 @@ function operate(aFFT, operation, valueA, valueB, valueC, valueD) {
         /* This function applies a sharpening filter to a colour channel.
          */
         sharpen: function (real, imag, radius, ideal, order, strength) {
-            var realSharp = new Float64Array(_sizeSq),
-                imagSharp = new Float64Array(_sizeSq);
+            var realSharp = new Float64Array(_specSizeSq),
+                imagSharp = new Float64Array(_specSizeSq);
 
             deepCopySingle(real, realSharp);
             deepCopySingle(imag, imagSharp);
             core.highPass(realSharp, imagSharp, radius, ideal, order);
 
-            for (var i = 0; i < _sizeSq; i++) {
+            for (var i = 0; i < _specSizeSq; i++) {
                 real[i] = real[i] + (strength * realSharp[i]);
                 imag[i] = imag[i] + (strength * imagSharp[i]);
             }
@@ -468,9 +361,9 @@ function operate(aFFT, operation, valueA, valueB, valueC, valueD) {
         notch: function (real, imag, paintData) {
             var point = 0;
 
-            for (var y = 0; y < _size; y++) {
-                i = y * _size;
-                for (var x = 0; x < _size; x++) {
+            for (var y = 0; y < _specHeight; y++) {
+                i = y * _specWidth;
+                for (var x = 0; x < _specWidth; x++) {
                     point = (i << 2) + (x << 2);
                     if (paintData[point + 3] !== 0) {
                         real[x + i] = imag[x + i] = 0;
@@ -491,11 +384,11 @@ function operate(aFFT, operation, valueA, valueB, valueC, valueD) {
                 windowXY = 0.0,
                 pi = Math.PI;
 
-            for (var y = 0; y < _height; y++) {
-                i = y * _width;
-                for (var x = 0; x < _width; x++) {
-                    radiusX = 2 * x / _width - 1;
-                    radiusY = 2 * y / _height - 1;
+            for (var y = 0; y < _imgHeight; y++) {
+                i = y * _imgWidth;
+                for (var x = 0; x < _imgWidth; x++) {
+                    radiusX = 2 * x / _imgWidth - 1;
+                    radiusY = 2 * y / _imgHeight - 1;
                     radiusXY = Math.sqrt(radiusX * radiusX + radiusY * radiusY);
                     windowXY = 0.5 * (Math.cos(pi * radiusXY) + 1);
                     point = (i << 2) + (x << 2);
@@ -537,7 +430,8 @@ function operate(aFFT, operation, valueA, valueB, valueC, valueD) {
     SpecMaker = _root.SpecMaker = {};
 
     var _context = null, //The context of the spectrum canvas
-        _size = 0,		 //Size of the spectrum
+        _width = 0,		 //Size of the spectrum
+        _height = 0,
         _sizeSq = 0,	 //Size of the spectrum squared
         _img = null,	 //The image data from the spectrum
         _data = null;	 //The raw pixel array
@@ -545,9 +439,10 @@ function operate(aFFT, operation, valueA, valueB, valueC, valueD) {
     var core = {
         init: function (context) {
             _context = context;
-            _size = context.canvas.width,
-                _sizeSq = _size * _size;
-            _img = context.getImageData(0, 0, _size, _size);
+            _width = context.canvas.width,
+            _height = context.canvas.height,
+            _sizeSq = _width * _height;
+            _img = context.getImageData(0, 0, _width, _height);
             _data = _img.data;
         },
 
@@ -682,9 +577,9 @@ function operate(aFFT, operation, valueA, valueB, valueC, valueD) {
         _draw: function (aSpec) {
             var point = 0;
 
-            for (var y = 0; y < _size; y++) {
-                i = y * _size;
-                for (var x = 0; x < _size; x++) {
+            for (var y = 0; y < _height; y++) {
+                i = y * _width;
+                for (var x = 0; x < _width; x++) {
                     point = (i << 2) + (x << 2);
                     _data[point] = aSpec.rSpec[i + x];
                     _data[point + 1] = aSpec.gSpec[i + x];
