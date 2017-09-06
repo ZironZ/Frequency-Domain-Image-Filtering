@@ -15,6 +15,15 @@
 
     <div class="AllWrapper">
         <input type="file" id="input"/>
+        <div id="PipeWrapper" class="buttonsLabelled">
+            <label class="buttonLabel">Pipeline</label>
+            <div id="Pipe">
+                <input type="radio" id="PipeCPU" name="pipeline" value="PipeCPU" checked="checked"/>
+                <label for="PipeCPU">CPU</label>
+                <input type="radio" id="PipeGPU" name="pipeline" value="PipeGPU"/>
+                <label for="PipeGPU">WebGL</label>
+            </div>
+        </div>
         <div id="HannWrapper" class="buttonsLabelled">
             <label class="buttonLabel">Hanning Window</label>
                 <div id="Hann">
@@ -40,14 +49,18 @@
 
         <div id="ImageHider" class="hider">
             <div class="imgLabel">Filtered Result<br/></div>
-            <div id="ResultWrapper" class="imgWrapper">
+            <div id="ResultWrapper" class="imgWrapper hider">
                 <canvas id="Result"></canvas>
+            </div>
+            <div id="ResultGPUWrapper" class="imgWrapper hider">
+                <canvas id="ResultGPU"></canvas>
             </div>
 
             <div class="imgLabel">Spectrum</div>
             <div id="NotchWrapper" class="imgWrapper">
                 <div style="position: relative">
                     <canvas id="Spectrum" style="position: absolute; left: 0; top: 0;"></canvas>
+                    <canvas id="MeasureSpec" style="position: absolute; left: 0; top: 0;"></canvas>
                     <canvas id="NotchSpec" style="position: absolute; left: 0; top: 0;"></canvas>
                 </div>
             </div>
@@ -69,8 +82,22 @@
                     <label for="BandStop">Band-Stop</label>
                     <input type="radio" id="Sharpen" name="ftype" value="Sharpen"/>
                     <label for="Sharpen">Sharpen</label>
+                    <input type="radio" id="Curve" name="ftype" value="Curve"/>
+                    <label for="Curve">Filtering Curve</label>
                     <input type="radio" id="Notch" name="ftype" value="Notch"/>
                     <label for="Notch">Notch</label>
+                </div>
+            </div>
+
+            <div id="FilterTypeGPUWrapper" class="hider buttonsLabelled">
+                <label class="buttonLabel">Filter Type</label>
+                <div id="FilterTypeGPU">
+                    <input type="radio" id="MeasureGPU" name="ftypeGPU" value="Measure" checked="checked"/>
+                    <label for="MeasureGPU">Measure</label>
+                    <input type="radio" id="CurveGPU" name="ftypeGPU" value="Curve"/>
+                    <label for="CurveGPU">Filtering Curve</label>
+                    <input type="radio" id="NotchGPU" name="ftypeGPU" value="Notch"/>
+                    <label for="NotchGPU">Notch</label>
                 </div>
             </div>
 
@@ -109,12 +136,38 @@
                 <div id="NotchSlider" class="Slider"></div>
             </div>
 
+            <div id="EditorWrapper" class="hider">
+                <div id="EditorInnerWrapper">
+                    <canvas id="Editor" width="750" height="150"></canvas>
+
+                    <div id="Gain" class="label">Gain</div>
+                    <div id="Frequency2" class="label">Frequency</div>
+
+                    <div id="Instructions">
+                        Click on curve to add points.<br/>
+                        Click and drag points to move.<br/>
+                        Press 'Del' on points to remove them.
+                    </div>
+                </div>
+                <p class="filterExamples">
+                    Examples:
+                    <span id="gaussianFilter">Gaussian Blur</span>,
+                    <span id="sharpenFilter">Sharpen</span>,
+                    <span id="edgeFilter">Edge Detection</span>,
+                    <span id="flatFilter">No Filter</span>
+                </p>
+            </div>
+
             <div id="MeasInfoHider" class="hider slideLabelled">
                 <div id="MeasInfo"><span></span></div>
             </div>
 
-            <div id="WipeButtonHider" class="hider slideLabelled">
-                <button id="WipeButton">Clear Measurement</button>
+            <div id="WipeMeasureHider" class="hider slideLabelled">
+                <button id="WipeMeasure">Clear Measurement</button>
+            </div>
+
+            <div id="WipeNotchHider" class="hider slideLabelled">
+                <button id="WipeNotch">Clear Spectrum</button>
             </div>
 
             <div id="SpectrumWrapper" class="buttonsLabelled">
@@ -131,11 +184,21 @@
                 </div>
             </div>
 
+            <div id="SpectrumGPUWrapper" class="hider buttonsLabelled">
+                <label class="buttonLabel">Spectrum Display</label>
+                <div id="ViewTypeGPU">
+                    <input type="radio" id="BasicGPU" name="viewGPU" value="Basic" checked="checked"/>
+                    <label for="BasicGPU">Basic</label>
+                    <input type="radio" id="PhaseGPU" name="viewGPU" value="Phase"/>
+                    <label for="PhaseGPU">Phase</label>
+                </div>
+            </div>
+
             <button id="ZoomIn">Zoom In</button>
             <button id="ZoomOut">Zoom Out</button>
             <button id="LockToImageRez">Lock to Image Resolution</button>
 
-            <div>
+            <div id="ApplyFilterHider" class="hider">
                 <button id="ApplyFilter">Apply Filtering</button>
             </div>
 
@@ -148,8 +211,6 @@
             </div>
         </div>
 
-        <div id="ArrayOfValues"></div>
-
         <div id="Etcetera">
             <p>
                 This site will not work in any version of IE below IE10.</p>
@@ -161,8 +222,13 @@
 <script src="./scripts/dicomParser.min.js"></script>
 <script src="./scripts/cornerstone.min.js"></script>
 <script src="./scripts/cornerstoneWADOImageLoader.min.js"></script>
-<script src="./scripts/front-end.js"></script>
+<script src="./scripts/curve.js"></script>
+<script src="./scripts/filterer.js"></script>
+<script src="./scripts/shared.js"></script>
 <script src="./scripts/fft.js"></script>
 <script src="./scripts/back-end.js"></script>
+<script src="./scripts/cpu-front-end.js"></script>
+<script src="./scripts/gpu-front-end.js"></script>
+<script src="./scripts/front-end.js"></script>
 </body>
 </html>

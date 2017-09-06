@@ -4,11 +4,12 @@ h1{font-family:"Georgia", serif; margin:0px 0px 25px 0px; padding-left:20px; tex
 .hider{display: none;}
 
 #input{margin:0px 0px 10px 0px;}
+#PipeWrapper{margin:0px 0px 10px 0px;}
 #HannWrapper{margin:0px 0px 10px 0px;}
 #BlueWrapper{margin:0px 0px 25px 0px;}
 
 .imgWrapper{margin:0px 0px 25px 0px; text-decoration: underline;}
-.imgLabel{padding-left:10px; text-decoration: underline;}
+.imgLabel{padding-left:10px; text-decoration: underline; font-size: 16px;}
 
 #FilterTypeWrapper{margin:0px 0px 15px 0px;}
 #FilterStyleHider{margin:0px 0px 15px 0px;}
@@ -21,10 +22,77 @@ h1{font-family:"Georgia", serif; margin:0px 0px 25px 0px; padding-left:20px; tex
 #NotchSlider{float:right; width:85%;}
 
 #SpectrumWrapper{margin:15px 0px 25px 0px;}
+#SpectrumGPUWrapper{margin:15px 0px 25px 0px;}
 
-.buttonLabel{padding-left:10px; text-decoration: underline;}
+.webglUnavailable{padding-left:10px; font-style: italic;}
+.buttonLabel{padding-left:10px; text-decoration: underline; font-size: 16px;}
 #WipeButton{margin:0px 0px 0px 0px;}
 #ZoomIn{margin:0px 0px 20px 0px;}
 #ZoomOut{margin:0px 0px 20px 0px;}
 #LockToImageRez{margin:0px 0px 20px 0px;}
 #ApplyFilter{margin:0px 0px 20px 0px;}
+#SaveSpec{margin:0px 0px 20px 0px;}
+
+#wrapper {
+    position: relative;
+    margin: 20px 20px 20px 20px;
+}
+
+#EditorInnerWrapper {
+    z-index: 0;
+    position: relative;
+    margin-top: 20px;
+    width: 750px;
+}
+
+#Instructions {
+    position: absolute;
+    top: 5px;
+    right: 5px;
+    text-align: right;
+
+    font-family: 'PT Sans', Arial, Helvetica, sans-serif;
+    color: black;
+    font-size: 12px;
+
+    pointer-events: none;
+}
+
+.label {
+    font-family: 'PT Sans', Arial, Helvetica, sans-serif;
+    font-size: 13px;
+    color: black;
+
+    position: absolute;
+
+    z-index: 5;
+}
+
+#frequency {
+    right: 5px;
+    bottom: 5px;
+}
+
+#Frequency2 {
+    right: 5px;
+    bottom: 5px;
+}
+
+#power {
+    left: 5px;
+    top: 5px;
+}
+
+#Gain {
+    left: 5px;
+    top: 5px;
+}
+
+.filterExamples {
+    font-size: 16px;
+}
+
+.filterExamples span {
+    text-decoration: underline;
+    cursor: pointer;
+}
