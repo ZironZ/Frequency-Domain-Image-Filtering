@@ -6,8 +6,6 @@ This was originally created as a final project for my university computer graphi
 
 The basic GPU filtering code was taken from [David Li's excellent implementation](https://github.com/dli/filtering), but it has been heavily modified to support features like arbitrarily sized images, displaying the effect of filtering on a 2d magnitude spectrum, and notch filtering. 
 
-You can test the application out [here](http://semapho.re/fft/).
-
 ### Overview of Features
 - CPU & GPU Features
   - Supports traditional web friendly image formats (BMP, JPEG, PNG) and simple DICOM images.
